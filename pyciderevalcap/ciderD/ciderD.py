@@ -15,14 +15,14 @@ class CiderD:
     Main Class to compute the CIDEr metric
 
     """
-    def __init__(self, n=4, sigma=6.0, df="corpus"):
+    def __init__(self, n=4, sigma=6.0, df="corpus", path="data"):
         # set cider to sum over 1 to 4-grams
         self._n = n
         # set the standard deviation parameter for gaussian penalty
         self._sigma = sigma
         # set which where to compute document frequencies from
         self._df = df
-        self.cider_scorer = CiderScorer(n=self._n, df_mode=self._df)
+        self.cider_scorer = CiderScorer(n=self._n, df_mode=self._df, path=path)
 
     def compute_score(self, gts, res):
         """

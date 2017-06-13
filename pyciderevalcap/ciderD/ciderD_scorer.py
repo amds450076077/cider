@@ -57,7 +57,7 @@ class CiderScorer(object):
         new.crefs = copy.copy(self.crefs)
         return new
 
-    def __init__(self, df_mode="corpus", test=None, refs=None, n=4, sigma=6.0):
+    def __init__(self, df_mode="corpus", test=None, refs=None, n=4, sigma=6.0, path='data'):
         ''' singular instance '''
         self.n = n
         self.sigma = sigma
@@ -65,7 +65,7 @@ class CiderScorer(object):
         self.ctest = []
         self.df_mode = df_mode
         if self.df_mode != "corpus":
-            self.document_frequency = pickle.load(open(os.path.join('data', df_mode + '.p'),'r'))       
+            self.document_frequency = pickle.load(open(os.path.join(path, df_mode + '.p'),'r'))
         self.cook_append(test, refs)
         self.ref_len = None
     
