@@ -178,6 +178,8 @@ class CiderScorer(object):
             self.ref_len = np.log(float(113287))
         elif 'coco-val' in self.df_mode:
             self.ref_len = np.log(float(5000))
+        elif 'aic-train5' in self.df_mode:
+            self.ref_len = np.log(float(235000))
 
         scores = []
         for test, refs in zip(self.ctest, self.crefs):
