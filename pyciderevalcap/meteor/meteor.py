@@ -18,15 +18,21 @@ class Meteor:
     def __init__(self):
         self.meteor_cmd = ['java', '-jar', '-Xmx2G', METEOR_JAR, \
                 '-', '-', '-stdio', '-l', 'en', '-norm']
+        # self.meteor_p = subprocess.Popen(self.meteor_cmd, \
+        #         cwd=os.path.dirname(os.path.abspath(__file__)), \
+        #         stdin=subprocess.PIPE, \
+        #         stdout=subprocess.PIPE, \
+        #         stderr=subprocess.PIPE)
+        # Used to guarantee thread safety
+        # self.lock = threading.Lock()
+
+    def compute_score(self, gts, res):
+
         self.meteor_p = subprocess.Popen(self.meteor_cmd, \
                 cwd=os.path.dirname(os.path.abspath(__file__)), \
                 stdin=subprocess.PIPE, \
                 stdout=subprocess.PIPE, \
                 stderr=subprocess.PIPE)
-        # Used to guarantee thread safety
-        self.lock = threading.Lock()
-
-    def compute_score(self, gts, res):
 
         # hypo = res_id['caption']
         # ref = gts[res_id['image_id']]
@@ -36,7 +42,7 @@ class Meteor:
         scores = []
 
         eval_line = 'EVAL'
-        self.lock.acquire()
+        # self.lock.acquire()
         for res_id in res:
 
             hypo = res_id['caption']
@@ -51,7 +57,19 @@ class Meteor:
             scores.append(float(self.meteor_p.stdout.readline().strip()))
 
         score = float(self.meteor_p.stdout.readline().strip())
-        self.lock.release()
+        # self.lock.release()
+
+        if self.meteor_p.stdin:
+            self.meteor_p.stdin.close()
+        if self.meteor_p.stdout:
+            self.meteor_p.stdout.close()
+        if self.meteor_p.stderr:
+            self.meteor_p.stderr.close()
+
+        try:
+            self.meteor_p.kill()
+        except OSError, e:
+            print(e)
 
         return score, np.array(scores)
 
@@ -82,9 +100,9 @@ class Meteor:
         self.lock.release()
         return score
  
-    def __del__(self):
-        self.lock.acquire()
-        self.meteor_p.stdin.close()
-        self.meteor_p.kill()
-        self.meteor_p.wait()
-        self.lock.release()
+    # def __del__(self):
+    #     self.lock.acquire()
+    #     self.meteor_p.stdin.close()
+    #     self.meteor_p.kill()
+    #     self.meteor_p.wait()
+    #     self.lock.release()
